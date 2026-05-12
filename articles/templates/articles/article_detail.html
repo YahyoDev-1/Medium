@@ -1,0 +1,47 @@
+{% extends "core/base.html" %}
+{% block content %}
+<article class="article-page container">
+  <header class="article-header">
+    <h1>{{ object.title }}</h1>
+    <div class="meta">By <a href="{% url 'accounts:profile' object.author.username %}">{{ object.author.username }}</a> • {{ object.published_at|date:"F j, Y" }}</div>
+    <div class="article-actions">
+      <button id="like-btn" class="like-btn {% if object.user_has_liked %}liked{% endif %}" data-article-id="{{ object.id }}">
+        <span class="heart">♥</span>
+        <span class="count">{{ object.likes.count }}</span>
+      </button>
+      {% if user == object.author %}
+        <a href="{% url 'articles:edit' object.slug %}" class="btn">Edit</a>
+        <a href="{% url 'articles:delete' object.slug %}" class="btn btn-outline">Delete</a>
+      {% endif %}
+    </div>
+  </header>
+
+  <div class="body content">
+    {{ object.body|safe }}
+  </div>
+
+  <footer class="tags">
+    {% for t in object.tags.all %}
+      <a href="{% url 'articles:list' %}?tag={{ t.slug }}" class="tag">#{{ t.name }}</a>
+    {% endfor %}
+  </footer>
+
+  <section id="comments" class="comments container">
+    <h3>Comments ({{ object.comments.count }})</h3>
+    <div class="comments-list">
+      {% include "comments/_comment.html" with comments=object.get_root_comments %}
+    </div>
+
+    {% if user.is_authenticated %}
+      <form method="post" action="{% url 'comments:add' %}" class="comment-form">
+        {% csrf_token %}
+        <textarea name="body" rows="4" placeholder="Write your thought..."></textarea>
+        <input type="hidden" name="article_id" value="{{ object.id }}">
+        <button type="submit" class="btn btn-primary">Post comment</button>
+      </form>
+    {% else %}
+      <p><a href="{% url 'accounts:login' %}?next={{ request.path }}">Log in</a> to join the discussion.</p>
+    {% endif %}
+  </section>
+</article>
+{% endblock %}

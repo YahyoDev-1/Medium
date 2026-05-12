@@ -1,0 +1,26 @@
+{% extends "core/base.html" %}
+{% block content %}
+  <h1>Articles</h1>
+  <div class="articles-grid">
+    {% for article in object_list %}
+      <article class="card">
+        <h2><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></h2>
+        <p class="meta">By <a href="{% url 'accounts:profile' article.author.username %}">{{ article.author.username }}</a> — {{ article.published_at|date:"M j, Y" }}</p>
+        <p>{{ article.excerpt|default:article.body|truncatewords:30 }}</p>
+      </article>
+    {% empty %}
+      <p>No articles found.</p>
+    {% endfor %}
+  </div>
+  {% if is_paginated %}
+    <div class="pagination">
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Prev</a>
+      {% endif %}
+      <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Next</a>
+      {% endif %}
+    </div>
+  {% endif %}
+{% endblock %}

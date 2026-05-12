@@ -1,0 +1,40 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="container" style="display:flex;gap:1.5rem">
+    <aside style="width:220px">
+        <div class="card" style="padding:1rem">
+            <ul style="list-style:none;padding:0;margin:0">
+                <li><a class="nav-link" href="{% url 'core:home' %}">Home</a></li>
+                <li><a class="nav-link" href="{% url 'interactions:library' %}">Library</a></li>
+                {% if request.user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'accounts:profile' request.user.username %}">Profile</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'accounts:login' %}">Login</a>
+                </li>
+                {% endif %}
+
+                <li><a class="nav-link" href="{% url 'interactions:stats' %}">Stats</a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <main style="flex:1">
+        <h1>Latest</h1>
+        <div class="articles-grid" style="margin-top:1rem">
+            {% for a in articles %}
+            <article class="card">
+                <h2><a href="{{ a.get_absolute_url }}">{{ a.title }}</a></h2>
+                <p class="meta">By <a href="{% url 'accounts:profile' a.author.username %}">{{ a.author.username }}</a>
+                    • {{ a.published_at|date:"M j, Y" }}</p>
+                <p>{{ a.excerpt|default:a.body|truncatewords:30 }}</p>
+            </article>
+            {% endfor %}
+        </div>
+    </main>
+
+    <aside style="width:220px"></aside>
+</div>
+{% endblock %}

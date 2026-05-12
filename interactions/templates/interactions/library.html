@@ -1,0 +1,75 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block content %}
+<div class="library-page">
+  <div class="container" style="display:flex;gap:1.5rem">
+    <aside class="left-nav" style="width:220px">
+      <div class="card" style="padding:1rem">
+        <ul style="list-style:none;padding:0;margin:0">
+          <li class="nav-item"><a href="{% url 'core:home' %}">Home</a></li>
+          <li class="nav-item active"><a href="{% url 'interactions:library' %}">Library</a></li>
+          <li class="nav-item"><a href="{% url 'accounts:profile' request.user.username %}">Profile</a></li>
+          <li class="nav-item"><a href="{% url 'interactions:stats' %}">Stats</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <main style="flex:1">
+      <h1>Your library</h1>
+      <div class="tabs" style="margin:.5rem 0 1rem;display:flex;gap:1rem;border-bottom:1px solid #eef5f6;padding-bottom:.75rem">
+        <a class="tab active">Saved lists</a>
+        <a class="tab">Highlights</a>
+        <a class="tab">Reading history</a>
+        <a class="tab">Responses</a>
+      </div>
+
+      <div class="card" style="background:linear-gradient(90deg,#0b8c42,#0b7b38);color:white;padding:1.25rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h3 style="margin:0">Create a list to easily organize and share stories</h3>
+          <p class="hint" style="color:rgba(255,255,255,0.9);margin:.5rem 0 0">Start a list</p>
+        </div>
+        <div>
+          <a class="btn btn-primary" href="{% url 'core:home' %}">Start a list</a>
+        </div>
+      </div>
+
+      <div>
+        {% if bookmarks %}
+          <div style="display:flex;flex-direction:column;gap:.75rem">
+            {% for b in bookmarks %}
+              <div class="card" style="display:flex;align-items:center;justify-content:space-between;padding:.75rem">
+                <div style="display:flex;gap:1rem;align-items:center">
+                  <div style="width:56px;height:56px;background:#f1f5f9;border-radius:6px;overflow:hidden">
+                    {% if b.article and b.article.tags.first %}
+                      {# Use first tag image placeholder or article first image if present (not implemented) #}
+                      <img src="{% static 'img/article-placeholder.png' %}" alt="" style="width:100%;height:100%;object-fit:cover">
+                    {% else %}
+                      <img src="{% static 'img/article-placeholder.png' %}" alt="" style="width:100%;height:100%;object-fit:cover">
+                    {% endif %}
+                  </div>
+                  <div>
+                    <a href="{{ b.article.get_absolute_url }}"><strong>{{ b.article.title }}</strong></a>
+                    <div class="meta" style="color:#6b7280;font-size:.9rem">by <a href="{% url 'accounts:profile' b.article.author.username %}">{{ b.article.author.username }}</a></div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:.5rem;align-items:center">
+                  <form method="post" class="inline" data-article-id="{{ b.article.id }}" action="{% url 'interactions:bookmark-toggle' b.article.id %}">
+                    {% csrf_token %}
+                    <button class="btn" type="submit">Remove</button>
+                  </form>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="card" style="padding:1rem">
+            <p>No saved stories yet. Save stories to your library to read them later.</p>
+          </div>
+        {% endif %}
+      </div>
+    </main>
+
+    <aside style="width:220px"></aside>
+  </div>
+</div>
+{% endblock %}

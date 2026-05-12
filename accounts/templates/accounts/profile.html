@@ -1,0 +1,49 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="profile-page container" style="display:flex;gap:1.5rem">
+  <aside class="profile-aside" style="width:220px">
+    <div class="card" style="padding:1rem;text-align:center">
+      {% if profile_user.avatar %}
+        <img src="{{ profile_user.avatar.url }}" alt="{{ profile_user.username }}" style="width:88px;height:88px;border-radius:50%;object-fit:cover">
+      {% else %}
+        <div style="width:88px;height:88px;border-radius:50%;background:#e6f3f2;display:flex;align-items:center;justify-content:center;font-weight:700;color:#0b5f6b">{{ profile_user.username|slice:":1"|upper }}</div>
+      {% endif %}
+      <h3 style="margin:.5rem 0 0">{{ profile_user.username }}</h3>
+      <p class="hint" style="margin:.25rem 0 0">{{ profile_user.bio }}</p>
+      <div style="margin-top:.75rem">
+        {% if profile_user.website %}
+          <a href="{{ profile_user.website }}" target="_blank" rel="noopener" class="hint">{{ profile_user.website }}</a>
+        {% endif %}
+      </div>
+      {% if request.user == profile_user %}
+        <a href="{% url 'accounts:profile_edit' profile_user.username %}" class="btn" style="margin-top:.75rem">Edit profile</a>
+      {% endif %}
+    </div>
+
+    <nav style="margin-top:1rem">
+      <ul style="list-style:none;padding:0;margin:0">
+        <li><a href="{% url 'core:home' %}" class="nav-link">Home</a></li>
+        <li><a href="{% url 'interactions:library' %}" class="nav-link">Library</a></li>
+        <li><a href="{% url 'interactions:stats' %}" class="nav-link">Stats</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main style="flex:1">
+    <div class="card" style="padding:1rem">
+      <h2>Stories by {{ profile_user.username }}</h2>
+      <div class="articles-grid" style="margin-top:1rem">
+        {% for a in articles %}
+          <article class="card">
+            <h3><a href="{{ a.get_absolute_url }}">{{ a.title }}</a></h3>
+            <p class="meta">Published {{ a.published_at|date:"M j, Y" }}</p>
+            <p>{{ a.excerpt|default:a.body|truncatewords:30 }}</p>
+          </article>
+        {% empty %}
+          <p>No published stories yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}

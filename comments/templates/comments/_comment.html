@@ -1,0 +1,13 @@
+{% for c in comments %}
+  <div class="comment">
+    <div class="meta">{{ c.author }} — {{ c.created_at }}</div>
+    <div class="body">{{ c.body|linebreaks }}</div>
+    {% if c.children.all %}
+      <div class="children">
+        {% include "comments/_comment.html" with comments=c.children.all %}
+      </div>
+    {% endif %}
+  </div>
+{% empty %}
+  <p>No comments yet.</p>
+{% endfor %}

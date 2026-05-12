@@ -1,0 +1,86 @@
+:root{
+  --max-width:900px;
+  --muted:#6b7280;
+  --bg:#ffffff;
+  --accent:#0b7285;
+  --accent-2:#0b5f6b;
+  --card:#ffffff;
+  --shadow: 0 6px 18px rgba(11,114,133,0.06);
+  --radius:8px;
+  --text:#111827;
+  --soft:#f7fafc;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; margin:0;background:linear-gradient(180deg,#f8fafc,white); color:var(--text); -webkit-font-smoothing:antialiased}
+.container{max-width:var(--max-width);margin:0 auto;padding:1rem}
+
+/* Header */
+.site-header{background:transparent;padding:1rem 0;position:sticky;top:0;z-index:40;backdrop-filter: blur(4px)}
+.header-inner{display:flex;align-items:center;gap:1rem;justify-content:space-between}
+.brand{font-weight:700;font-size:1.25rem;color:var(--accent);text-decoration:none}
+.search-form input[type="search"]{padding:.5rem .75rem;border-radius:999px;border:1px solid #e6eef0;min-width:260px;outline:none}
+.nav{display:flex;gap:.5rem;align-items:center}
+.nav-link{color:var(--muted);text-decoration:none;padding:.35rem .6rem;border-radius:6px}
+.nav-link:hover{background:#f1f5f9;color:var(--text)}
+.btn-signup{background:var(--accent);color:white;padding:.5rem .75rem;border-radius:6px;text-decoration:none}
+
+/* Main layout */
+.main{padding:2rem 0}
+
+/* Cards & content */
+.card{background:var(--card);padding:1rem;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid #eef5f6}
+
+/* Article List */
+.articles-grid{display:grid;grid-template-columns:1fr;gap:1rem}
+@media(min-width:900px){.articles-grid{grid-template-columns:1fr 1fr}}
+
+/* Article page */
+.article-page{max-width:720px;margin:0 auto}
+.article-header{margin-bottom:1rem}
+.article-header h1{font-size:2.25rem;margin:0 0 .25rem}
+.article-header .meta{color:var(--muted);font-size:.95rem;margin-bottom:.5rem}
+.article-actions{display:flex;gap:.5rem;align-items:center}
+
+.like-btn{background:transparent;border:1px solid #e6eef0;padding:.4rem .6rem;border-radius:6px;display:inline-flex;align-items:center;gap:.45rem;cursor:pointer;color:var(--muted)}
+.like-btn .heart{color:#e11d48;font-weight:700}
+.like-btn.liked{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;border-color:transparent;box-shadow:0 6px 20px rgba(11,114,133,0.12)}
+.like-btn .count{font-weight:600}
+
+/* Editor */
+.editor-container{max-width:820px;margin:0 auto}
+.editor-top input[type="text"]{width:100%;padding:.75rem 1rem;border:none;border-bottom:1px solid #e6eef0;margin-bottom:.5rem;font-size:1.5rem}
+.editor-excerpt{padding:.5rem .75rem;border:1px solid #e6eef0;border-radius:6px;margin-bottom:.75rem}
+.rich-editor{min-height:320px;background:white;padding:1.25rem;border-radius:8px;border:1px solid #e6eef0;margin-bottom:.75rem;outline:none}
+.rich-editor:focus{box-shadow:0 6px 18px rgba(11,114,133,0.06)}
+.editor-meta{display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.tags-input{display:flex;flex-direction:column;gap:.25rem}
+.tag-input input{padding:.5rem .75rem;border-radius:999px;border:1px solid #e6eef0;min-width:220px}
+.publish-actions{display:flex;gap:.5rem;align-items:center}
+.status-select{padding:.45rem .6rem;border-radius:6px;border:1px solid #e6eef0}
+.btn{padding:.5rem .75rem;border-radius:6px;border:1px solid #e6eef0;background:transparent}
+.btn-primary{background:var(--accent);color:white;border-color:transparent}
+
+/* Comments */
+.comments{margin-top:2rem;border-top:1px solid #eef5f6;padding-top:1rem}
+.comment{padding:.75rem;border-radius:6px;border:1px solid #f1f5f9;margin-bottom:.65rem;background:white}
+.comment .meta{font-size:.85rem;color:var(--muted);margin-bottom:.4rem}
+.comment .body{white-space:pre-wrap}
+
+/* Footer */
+.site-footer{padding:2rem 0;margin-top:2rem;border-top:1px solid #eef5f6;background:transparent}
+.footer-inner{display:flex;justify-content:space-between;align-items:center;color:var(--muted)}
+
+/* utilities */
+.hint{color:var(--muted);font-size:.85rem}
+/* --- Sidebar and layout additions --- */
+/* Ensure these rules are compatible with the existing CSS file */
+.left-nav .nav-item{padding:.5rem 0}
+.left-nav .nav-item a{color:var(--muted);text-decoration:none}
+.left-nav .nav-item .active, .left-nav .nav-item a:hover {color:var(--text)}
+
+.center-sheet{display:flex;align-items:center;justify-content:center}
+
+.btn-danger{background:#ef4444;color:white;border:none;padding:.5rem .75rem;border-radius:6px}
+.inline{display:inline}

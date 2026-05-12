@@ -1,0 +1,41 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block content %}
+<section class="editor-container container">
+  <form method="post" class="article-form" id="article-form">{% csrf_token %}
+    <div class="editor-top" style="margin-bottom:.5rem">
+      <input type="text" id="id_title" name="title" class="editor-title" placeholder="Title" value="{{ form.initial.title|default_if_none:'' }}" required>
+      <input type="text" name="excerpt" class="editor-excerpt" placeholder="Add a short description (optional)" value="{{ form.initial.excerpt|default_if_none:'' }}">
+    </div>
+
+    <div class="editor-toolbar" style="display:flex;justify-content:flex-end;gap:.5rem;margin-bottom:.5rem">
+      <label class="btn" for="media-upload-input">Add</label>
+      <input id="media-upload-input" type="file" accept="image/*,video/*,application/pdf,application/msword,.docx,.txt" style="display:none">
+    </div>
+
+    <div id="editor" class="rich-editor" contenteditable="true" aria-label="Article body">
+      {{ form.initial.body_html|safe }}
+    </div>
+
+    {{ form.body_html }} {# hidden input will be synchronized with editor #}
+
+    <div class="editor-meta">
+      <div class="tags-input">
+        <label for="id_tags">Tags</label>
+        <div id="tag-input" class="tag-input">
+          <input id="id_tags" name="tags" placeholder="Type tag and press Enter" value="{{ form.initial.tags|default_if_none:'' }}">
+        </div>
+        <small class="hint">Add comma-separated tags or press enter to add single tags.</small>
+      </div>
+
+      <div class="publish-actions">
+        <select name="status" class="status-select">
+          <option value="draft" {% if form.initial.status == "draft" %}selected{% endif %}>Save draft</option>
+          <option value="published" {% if form.initial.status == "published" %}selected{% endif %}>Publish</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
+    </div>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "core/base.html" %}
+{% block content %}
+  <section class="container">
+    <h2>Latest</h2>
+    <ul class="article-list">
+      {% for a in articles %}
+        <li>
+          <a href="{{ a.get_absolute_url }}">{{ a.title }}</a>
+          <div class="meta">by <a href="{% url 'accounts:profile' a.author.username %}">{{ a.author.username }}</a> — {{ a.published_at|date:"M j, Y" }}</div>
+        </li>
+      {% empty %}
+        <li>No articles yet.</li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endblock %}
