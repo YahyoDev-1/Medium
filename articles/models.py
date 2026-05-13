@@ -1,10 +1,16 @@
 # Create your models here.
+from django.db import models
+from django.utils.text import slugify
+from django.urls import reverse
+from django.conf import settings
+from django.utils import timezone
 
 from django.db import models
 from django.utils.text import slugify
 from django.urls import reverse
 from django.conf import settings
 from django.utils import timezone
+from django_quill.fields import QuillField
 
 
 class Tag(models.Model):
@@ -26,10 +32,18 @@ class Article(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="articles")
     title = models.CharField(max_length=255)
     slug = models.SlugField(max_length=300, unique=True, blank=True)
+
+    # Changed from TextField to QuillField for rich text editing
     body = models.TextField()
+
     excerpt = models.TextField(blank=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="draft")
     tags = models.ManyToManyField(Tag, blank=True, related_name="articles")
+
+    # Cover image (optional)
+    cover_image = models.ImageField(upload_to="article_covers/", blank=True, null=True)
+
+    views_count = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     published_at = models.DateTimeField(blank=True, null=True)

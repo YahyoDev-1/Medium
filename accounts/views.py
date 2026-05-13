@@ -40,9 +40,8 @@ def profile_view(request, username):
         "stats": stats
     })
 
-
 @login_required
-def profile_edit(request):
+def profile_edit(request, username): # 'username' argumentini qo'shdik
     if request.method == "POST":
         form = ProfileForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
@@ -52,6 +51,7 @@ def profile_edit(request):
     else:
         form = ProfileForm(instance=request.user)
     return render(request, "accounts/profile_edit.html", {"form": form})
+
 
 
 @require_http_methods(["GET", "POST"])

@@ -1,26 +1,108 @@
 {% extends "core/base.html" %}
 {% block content %}
-  <h1>Articles</h1>
-  <div class="articles-grid">
-    {% for article in object_list %}
-      <article class="card">
-        <h2><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></h2>
-        <p class="meta">By <a href="{% url 'accounts:profile' article.author.username %}">{{ article.author.username }}</a> — {{ article.published_at|date:"M j, Y" }}</p>
-        <p>{{ article.excerpt|default:article.body|truncatewords:30 }}</p>
-      </article>
-    {% empty %}
-      <p>No articles found.</p>
-    {% endfor %}
-  </div>
-  {% if is_paginated %}
-    <div class="pagination">
-      {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Prev</a>
-      {% endif %}
-      <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-      {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Next</a>
-      {% endif %}
+<div style="display:flex;gap:0;width:100%">
+  <aside class="left-sidebar">
+    <div class="card">
+      <ul>
+        <li class="nav-item"><a href="{% url 'core:home' %}">🏠 Home</a></li>
+        <li class="nav-item"><a href="{% url 'articles:list' %}" class="active">📰 Articles</a></li>
+        {% if user.is_authenticated %}
+          <li class="nav-item"><a href="{% url 'interactions:library' %}">📚 Library</a></li>
+        {% endif %}
+      </ul>
     </div>
-  {% endif %}
+  </aside>
+
+  <section class="center-feed">
+    <h1 style="margin-bottom:2rem">All Articles</h1>
+
+    <div class="article-feed">
+      {% for article in object_list %}
+        <div class="article-item">
+          {% if article.cover_image %}
+            <div class="article-cover">
+              <a href="{{ article.get_absolute_url }}" style="display:block;width:100%;height:100%">
+                <img src="{{ article.cover_image.url }}" alt="{{ article.title }}" loading="lazy">
+              </a>
+            </div>
+          {% else %}
+            <div class="article-cover">
+              <div style="width:100%;height:100%;background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:2rem">
+                ✨
+              </div>
+            </div>
+          {% endif %}
+
+          <div class="article-content">
+            <div class="article-meta">
+              <div class="article-author">
+                {% if article.author.avatar %}
+                  <div class="article-author-avatar">
+                    <img src="{{ article.author.avatar.url }}" alt="">
+                  </div>
+                {% else %}
+                  <div class="article-author-avatar">{{ article.author.username|slice:":1"|upper }}</div>
+                {% endif %}
+                <span><a href="{% url 'accounts:profile' article.author.username %}">{{ article.author.username }}</a></span>
+              </div>
+              <span>{{ article.published_at|date:"M j, Y" }}</span>
+            </div>
+
+            <h2><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></h2>
+
+            <!-- Show excerpt or plain text from Quill body -->
+            <p class="article-excerpt">
+              {% if article.excerpt %}
+                {{ article.excerpt|truncatewords:40 }}
+              {% else %}
+                {{ article.body.html|striptags|truncatewords:40 }}
+              {% endif %}
+            </p>
+
+            <div class="article-actions">
+          <button id="like-btn" class="like-btn {% if object.user_has_liked %}liked{% endif %}" data-article-id="{{ object.id }}">
+              <span class="heart">❤</span>
+              <span class="count">{{ object.likes.count }}</span>
+          </button>
+                      <button id="bookmark-btn"
+                        class="btn {% if object.user_has_bookmarked %}saved{% endif %}"
+                        data-article-id="{{ object.id }}" title="Save to library">
+                        <span class="icon"></span>
+                        <span class="label">Save</span>
+                    </button>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="card" style="padding:2rem;text-align:center">
+          <p>No articles found.</p>
+        </div>
+      {% endfor %}
+    </div>
+
+    {% if is_paginated %}
+      <div class="pagination">
+        {% if page_obj.has_previous %}
+          <a href="?page=1">First</a>
+          <a href="?page={{ page_obj.previous_page_number }}">← Prev</a>
+        {% endif %}
+        <span>{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}">Next →</a>
+          <a href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </section>
+
+  <aside class="right-sidebar">
+    <div class="card">
+      <h3>🔍 Filter</h3>
+      <form method="get" style="display:flex;flex-direction:column;gap:.5rem">
+        <input type="search" name="q" placeholder="Search..." value="{{ request.GET.q|default:'' }}" style="padding:.5rem;border:1px solid var(--border);border-radius:var(--radius)">
+        <button type="submit" class="btn btn-primary">Search</button>
+      </form>
+    </div>
+  </aside>
+</div>
 {% endblock %}

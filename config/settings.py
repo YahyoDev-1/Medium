@@ -38,14 +38,16 @@ INSTALLED_APPS = [
 
     # Third-party
     "crispy_forms",
+    "django_quill",
 
     # Local apps
     "accounts",
     "articles",
     "comments",
     "interactions",
-    "search",
+    "notifications",
     "core",
+    'stats',
 ]
 
 MIDDLEWARE = [
@@ -141,3 +143,36 @@ LOGOUT_REDIRECT_URL = "/"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# --- Media upload limits (bytes). Tweak as needed ---
+# Max sizes (bytes): images 5MB, video 25MB, generic files 10MB
+IMAGE_MAX_UPLOAD_SIZE = 5 * 1024 * 1024      # 5 MB
+VIDEO_MAX_UPLOAD_SIZE = 25 * 1024 * 1024     # 25 MB
+FILE_MAX_UPLOAD_SIZE  = 10 * 1024 * 1024     # 10 MB
+
+# Allowed content types (extend as needed)
+ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"]
+ALLOWED_VIDEO_TYPES = ["video/mp4", "video/webm", "video/ogg"]
+ALLOWED_FILE_TYPES  = [
+    "application/pdf",
+    "text/plain",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+]
+# Quill Editor Configuration
+QUILL_CONFIGS = {
+    'default': {
+        'theme': 'snow',
+        'modules': {
+            'syntax': False,
+            'toolbar': [
+                ['bold', 'italic', 'underline', 'strike'],
+                ['blockquote', 'code-block'],
+                [{'header': 1}, {'header': 2}],
+                [{'list': 'ordered'}, {'list': 'bullet'}],
+                ['link', 'image', 'video'],
+                ['clean']
+            ]
+        }
+    }
+}
