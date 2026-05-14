@@ -21,8 +21,8 @@
 
       <!-- Title Input -->
       <div style="margin-bottom:2rem">
-        <input type="text" name="title" class="editor-title" placeholder="Write your article title" value="{{ form.initial.title|default_if_none:'' }}" required style="width:100%;font-size:2.5rem;font-weight:700;border:none;outline:none;line-height:1.3;margin-bottom:.5rem">
-        <textarea name="excerpt" class="editor-excerpt" placeholder="Add a compelling summary (optional)" style="width:100%;padding:.75rem 0;border:none;outline:none;font-size:1rem;resize:none;font-family:inherit;color:var(--muted)">{{ form.initial.excerpt|default_if_none:'' }}</textarea>
+        <input type="text" name="title" class="editor-title" placeholder="Write your article title" value="{{ form.instance.title|default:form.initial.title|default_if_none:'' }}" required style="width:100%;font-size:2.5rem;font-weight:700;border:none;outline:none;line-height:1.3;margin-bottom:.5rem">
+        <textarea name="excerpt" class="editor-excerpt" placeholder="Add a compelling summary (optional)" style="width:100%;padding:.75rem 0;border:none;outline:none;font-size:1rem;resize:none;font-family:inherit;color:var(--muted)">{{ form.instance.excerpt|default:form.initial.excerpt|default_if_none:'' }}</textarea>
       </div>
 
       <!-- Divider -->
@@ -84,17 +84,31 @@
         <div>
           <h4 style="margin:0 0 1rem">📅 Status</h4>
           <select name="status" class="status-select" style="width:100%;padding:.75rem;border:1px solid var(--border);border-radius:var(--radius)">
-            <option value="draft" {% if form.initial.status == "draft" %}selected{% endif %}>Save as Draft</option>
-            <option value="published" {% if form.initial.status == "published" %}selected{% endif %}>Publish Now</option>
+            <option value="draft"{% if form.instance.status == "draft" or form.initial.status == "draft" %}selected{% endif %}>Save as Draft</option>
+            <option value="published"{% if form.instance.status == "published" or form.initial.status == "published" %}selected{% endif %}>Publish Now</option>
           </select>
         </div>
         <div>
+  <div>
+    <h4 style="margin:0 0 1rem">🔒 Visibility</h4>
+    <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer">
+      <input type="checkbox" name="is_member_only" {% if form.initial.is_member_only %}checked{% endif %} style="cursor:pointer">
+      <span>Member-only story</span>
+    </label>
+    <small class="hint">Only your followers can read this</small>
+  </div>
+</div>
+
+<div style="text-align:center;margin-top:1rem">
+  <button type="submit" class="btn btn-primary" style="padding:.75rem 2rem;font-weight:600;cursor:pointer;min-width:200px">
+    {% if object %}Update Article{% else %}Publish Article{% endif %}
+  </button>
+</div>
           <h4 style="margin:0 0 1rem">💾 Save</h4>
           <button type="submit" class="btn btn-primary" style="width:100%;padding:.75rem;font-weight:600;cursor:pointer">
             {% if object %}Update Article{% else %}Publish Article{% endif %}
           </button>
         </div>
-      </div>
 
       <!-- Preview Button (optional) -->
       <div style="text-align:center;margin-top:2rem">

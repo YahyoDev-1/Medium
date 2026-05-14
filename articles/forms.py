@@ -12,10 +12,15 @@ class ArticleForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'placeholder': 'e.g. technology, django, web'})
     )
 
-    # Use QuillFormField for the body
     body = forms.CharField(
         required=True,
         widget=forms.HiddenInput()
+    )
+
+    is_member_only = forms.BooleanField(
+        required=False,
+        label="Member-only story",
+        help_text="Only your followers can read this article"
     )
 
     cover_image = forms.ImageField(required=False, widget=forms.FileInput(attrs={
@@ -25,7 +30,7 @@ class ArticleForm(forms.ModelForm):
 
     class Meta:
         model = Article
-        fields = ["title", "excerpt", "body", "cover_image", "status", "tags"]
+        fields = ["title", "excerpt", "body", "cover_image","is_member_only", "status", "tags"]
         widgets = {
             "title": forms.TextInput(attrs={
                 "placeholder": "Article title",

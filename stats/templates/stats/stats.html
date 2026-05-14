@@ -113,7 +113,15 @@
                       <div class="hint" style="font-size:.85rem">{{ f.follower.bio|truncatewords:10 }}</div>
                     </div>
                   </div>
-                  <button class="btn-follow" data-user-id="{{ f.follower.id }}" style="font-size:.85rem">Following</button>
+                  <!-- Update the follow buttons in the Audience tab section: -->
+                  <button class="btn-follow" data-user-id="{{ f.follower.id }}" style="font-size:.85rem;cursor:pointer;white-space:nowrap">
+                    {% if is_following %}Following{% else %}Follow{% endif %}
+                  </button>
+
+                  <!-- And for unfollow: -->
+                  <button class="btn-unfollow" data-user-id="{{ f.following.id }}" style="font-size:.85rem;cursor:pointer;white-space:nowrap;background:#f3f4f6">
+                    Unfollow
+                  </button>
                 </div>
               {% endfor %}
             </div>

@@ -839,7 +839,63 @@ a:hover {
   }
 }
 
-/* Stats page additions */
+/* Member-only badge styles */
+.member-only-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+}
+
+.member-only-badge-sm {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #fef3c7;
+  color: #92400e;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Follow button styles - ENHANCED */
+#follow-btn {
+  background: transparent;
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+#follow-btn:hover {
+  background: rgba(11, 114, 133, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(11, 114, 133, 0.15);
+}
+
+#follow-btn.following {
+  background: var(--accent);
+  color: white;
+  border-color: transparent;
+}
+
+#follow-btn.following:hover {
+  background: var(--accent-2);
+  box-shadow: 0 4px 12px rgba(11, 114, 133, 0.3);
+}
+
 .btn-follow,
 .btn-unfollow {
   padding: 0.5rem 0.75rem;
@@ -850,6 +906,7 @@ a:hover {
   font-weight: 500;
   font-size: 0.9rem;
   transition: var(--transition);
+  white-space: nowrap;
 }
 
 .btn-follow:hover,

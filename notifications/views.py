@@ -1,12 +1,70 @@
-from django.shortcuts import render
-
-# Create your views here.
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_http_methods
+from django.contrib import messages
 from .models import Notification, ReadingHistory, UserFollowing
 from django.db.models import Q
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+
+@login_required
+@require_http_methods(["POST"])
+def follow_user(request, user_id):
+    """
+    Follow or unfollow a user. Send notification and Django message.
+    Supports both AJAX (JSON) and form POST.
+    """
+    user_to_follow = get_object_or_404(User, pk=user_id)
+
+    if user_to_follow == request.user:
+        error_msg = "You cannot follow yourself."
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({"error": error_msg}, status=400)
+        messages.error(request, error_msg)
+        return redirect('core:home')
+
+    # Toggle follow
+    following_rel, created = UserFollowing.objects.get_or_create(
+        follower=request.user,
+        following=user_to_follow
+    )
+
+    if not created:
+        # User was already following, so unfollow
+        following_rel.delete()
+        is_following = False
+        msg = f"You unfollowed {user_to_follow.username}."
+        status_msg = "success"
+    else:
+        # New follow
+        is_following = True
+        msg = f"You are now following {user_to_follow.username}."
+        status_msg = "success"
+
+        # Create notification for the followed user
+        Notification.objects.create(
+            recipient=user_to_follow,
+            sender=request.user,
+            notification_type="follow",
+            title=f"{request.user.username} started following you",
+            description=""
+        )
+
+    # Handle AJAX requests (return JSON)
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({
+            "is_following": is_following,
+            "followers_count": user_to_follow.followers.count(),
+            "message": msg
+        })
+
+    # Handle regular form submissions (redirect with message)
+    messages.success(request, msg)
+    return redirect(request.META.get('HTTP_REFERER', 'core:home'))
+
 
 @login_required
 def notifications_list(request):
@@ -20,6 +78,7 @@ def notifications_list(request):
         "unread_count": unread_count
     })
 
+
 @login_required
 @require_POST
 def mark_as_read(request, notification_id):
@@ -30,6 +89,7 @@ def mark_as_read(request, notification_id):
     notification.mark_as_read()
     return JsonResponse({"success": True, "is_read": notification.is_read})
 
+
 @login_required
 @require_POST
 def mark_all_as_read(request):
@@ -39,6 +99,7 @@ def mark_all_as_read(request):
     request.user.notifications.filter(is_read=False).update(is_read=True)
     return JsonResponse({"success": True})
 
+
 @login_required
 def unread_count(request):
     """
@@ -47,40 +108,6 @@ def unread_count(request):
     count = request.user.notifications.filter(is_read=False).count()
     return JsonResponse({"unread_count": count})
 
-@login_required
-@require_POST
-def follow_user(request, user_id):
-    """
-    Follow or unfollow a user. Toggle.
-    """
-    from django.contrib.auth import get_user_model
-    User = get_user_model()
-    user_to_follow = get_object_or_404(User, pk=user_id)
-
-    if user_to_follow == request.user:
-        return JsonResponse({"error": "Cannot follow yourself."}, status=400)
-
-    following, created = UserFollowing.objects.get_or_create(
-        follower=request.user,
-        following=user_to_follow
-    )
-
-    if not created:
-        following.delete()
-        is_following = False
-    else:
-        is_following = True
-        # Create a notification for the followed user
-        Notification.objects.create(
-            recipient=user_to_follow,
-            sender=request.user,
-            notification_type="follow",
-            title=f"{request.user.username} followed you",
-            description=""
-        )
-
-    followers_count = user_to_follow.followers.count()
-    return JsonResponse({"is_following": is_following, "followers_count": followers_count})
 
 @login_required
 def reading_history(request):

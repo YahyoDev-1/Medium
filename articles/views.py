@@ -1,7 +1,8 @@
 from urllib import request
 
+from django.contrib import messages
 from django.db import models
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -56,6 +57,15 @@ class ArticleDetailView(DetailView):
     model = Article
     template_name = "articles/article_detail.html"
 
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+
+        # Check if user can view this article
+        if not obj.can_view(self.request.user):
+            raise Http404("This article is for members only.")
+
+        return obj
+
     def get_queryset(self):
         queryset = super().get_queryset()
         user = self.request.user
@@ -99,6 +109,17 @@ class ArticleDetailView(DetailView):
 
         return response
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        if self.request.user.is_authenticated:
+            context['is_following'] = self.object.author.followers.filter(
+                follower=self.request.user
+            ).exists()
+        else:
+            context['is_following'] = False
+
+        return context
 
 
 class ArticleCreateView(LoginRequiredMixin, CreateView):
@@ -140,21 +161,25 @@ class ArticleUpdateView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):
 
     def get_initial(self):
         initial = super().get_initial()
-        # prepare tags line
         initial["tags"] = ", ".join([t.name for t in self.get_object().tags.all()])
-        initial["body_html"] = self.get_object().body
         return initial
 
     def form_valid(self, form):
-        form.instance = self.get_object()
-        form.save(author=self.request.user)
-        return super().form_valid(form)
-
+        # form.instance allaqachon mavjud ob'ektga bog'liq
+        # author ni o'zgartirmaslik kerak
+        article = form.save(commit=False)
+        article.save()
+        form.save_m2m()  # agar tags M2M bo'lsa
+        return redirect(article.get_absolute_url())
 
 class ArticleDeleteView(LoginRequiredMixin, AuthorRequiredMixin, DeleteView):
     model = Article
     success_url = reverse_lazy("articles:list")
     template_name = "articles/article_confirm_delete.html"
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, "Article deleted successfully!")
+        return super().delete(request, *args, **kwargs)
 
 
 # Keep existing imports and view classes above; add the following to the bottom
@@ -205,10 +230,9 @@ def upload_media(request):
 
 import os
 import uuid
-from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.conf import settings

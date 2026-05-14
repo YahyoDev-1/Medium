@@ -47,6 +47,12 @@
               </div>
               <span>{{ article.published_at|date:"M j, Y" }}</span>
             </div>
+              {% if article.is_member_only %}
+    <div style="display:inline-flex;align-items:center;gap:.5rem;background:#fef3c7;color:#92400e;padding:.35rem .6rem;border-radius:999px;font-size:.8rem;font-weight:600;margin-bottom:.5rem">
+      <span>⭐</span>
+      <span>Member-only</span>
+    </div>
+  {% endif %}
 
             <h2><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></h2>
 

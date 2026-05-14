@@ -18,6 +18,12 @@
 
       <!-- Header -->
       <header class="article-header">
+        {% if object.is_member_only %}
+            <div style="display:inline-flex;align-items:center;gap:.5rem;background:#fef3c7;color:#92400e;padding:.5rem .75rem;border-radius:999px;margin-bottom:1rem;font-size:.85rem;font-weight:600">
+                <span>⭐</span>
+                <span>Member-only story</span>
+            </div>
+        {% endif %}
         <h1>{{ object.title }}</h1>
         <div class="meta">
           <div>
@@ -27,10 +33,8 @@
           {% if user != object.author and user.is_authenticated %}
             <button id="follow-btn"
                 class="btn {% if object.user_follows_author %}following{% endif %}"
-                data-author-id="{{ object.author.id }}">
-                <span>
-                      {% if object.user_follows_author %}Following{% else %}Follow{% endif %}
-                </span>
+                data-author-id="{{ object.author.id }}" style="cursor:pointer;white-space:nowrap">
+                {% if is_following %}Following{% else %}Follow{% endif %}
           </button>
           {% endif %}
         </div>
@@ -69,7 +73,7 @@
       <!-- Tags -->
       <footer class="tags">
         {% for t in object.tags.all %}
-          <a href="{% url 'articles:list' %}?tag={{ t.slug }}" class="tag">#{{ t.name }}</a>
+          <a href="{% url 'articles:list' %}?tag={{ t.slug }}" class="tag">{{ t.name }}</a>
         {% endfor %}
       </footer>
 

@@ -40,6 +40,12 @@ class Article(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="draft")
     tags = models.ManyToManyField(Tag, blank=True, related_name="articles")
 
+    # Member-only flag
+    is_member_only = models.BooleanField(
+        default=False,
+        help_text="Only followers can read this article"
+    )
+
     # Cover image (optional)
     cover_image = models.ImageField(upload_to="article_covers/", blank=True, null=True)
 
@@ -70,6 +76,16 @@ class Article(models.Model):
 
     def get_absolute_url(self):
         return reverse("articles:detail", kwargs={"slug": self.slug})
+
+    def can_view(self, user):
+        """Check if a user can view this article."""
+        if not self.is_member_only:
+            return True
+        if user == self.author:
+            return True
+        if user and user.is_authenticated:
+            return self.author.following.filter(follower=user).exists()
+        return False
 
     def get_root_comments(self):
         return self.comments.filter(parent__isnull=True)\
