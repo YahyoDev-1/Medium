@@ -9,7 +9,7 @@ class Notification(models.Model):
         ("new_article", "New Article"),
         ("comment", "Comment"),
         ("reply", "Reply to Comment"),
-        ("like", "Article Liked"),
+        ("bookmark", "Article Liked"),
         ("follow", "New Follower"),
     )
 

@@ -1,13 +1,11 @@
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import get_object_or_404, render
 from articles.models import Article
 from .models import ArticleLike, Bookmark, ReadingList, ReadingListItem
 from django.db import IntegrityError
-from django.views.decorators.csrf import csrf_exempt
-from django.urls import reverse
-from django.utils.text import slugify
+
 
 # Add this import at top
 from notifications.models import Notification
@@ -32,7 +30,7 @@ def toggle_bookmark(request, article_id):
             Notification.objects.create(
                 recipient=article.author,
                 sender=request.user,
-                notification_type="like",
+                notification_type="bookmark",
                 article=article,
                 title=f"{request.user.username} saved your article",
                 description=f"'{article.title}'"

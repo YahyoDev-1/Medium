@@ -41,13 +41,13 @@ INSTALLED_APPS = [
     "django_quill",
 
     # Local apps
-    "accounts",
-    "articles",
-    "comments",
-    "interactions",
-    "notifications",
-    "core",
-    'stats',
+    'accounts.apps.AccountsConfig',
+    'articles.apps.ArticlesConfig',
+    'comments.apps.CommentsConfig',
+    'core.apps.CoreConfig',
+    'interactions.apps.InteractionsConfig',
+    'notifications.apps.NotificationsConfig',
+    'stats.apps.StatsConfig',
 ]
 
 MIDDLEWARE = [

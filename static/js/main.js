@@ -154,7 +154,6 @@ document.addEventListener("click", function (e) {
           alert(data.error);
           return;
         }
-
         if (data.is_following) {
           followBtn.textContent = "Following";
           followBtn.classList.add("following");
@@ -162,8 +161,6 @@ document.addEventListener("click", function (e) {
           followBtn.textContent = "Follow";
           followBtn.classList.remove("following");
         }
-
-        console.log(data.message);
         if (typeof loadNotificationsBadge === "function") {
           loadNotificationsBadge();
         }
@@ -225,3 +222,62 @@ document.addEventListener("DOMContentLoaded", function () {
             video.style.maxWidth = "100%";
             editor.appendChild(video);
           } else {
+            // Generic file link
+            const a = document.createElement("a");
+            a.href = data.url;
+            a.textContent = data.name || "Download file";
+            a.target = "_blank";
+            editor.appendChild(a);
+          }
+        } else {
+          alert(data.error || "Upload failed.");
+        }
+      }).catch(err => {
+        loader.remove();
+        console.error("Media upload failed:", err);
+        alert("Upload failed. Please try again.");
+      });
+    });
+  }
+
+  if (coverInput && coverPreview) {
+    coverInput.addEventListener("change", function (ev) {
+      const file = ev.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        coverPreview.src = e.target.result;
+        coverPreview.style.display = "block";
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ==========================================
+  // 4. NOTIFICATIONS BADGE (o'qilmagan bildirishnomalar)
+  // ==========================================
+  function loadNotificationsBadge() {
+    fetch("/notifications/unread-count/", {credentials: "same-origin"})
+      .then(res => res.json())
+      .then(data => {
+        const badge = document.getElementById("notif-badge");
+        if (!badge) return;
+        if (data.unread_count > 0) {
+          badge.textContent = data.unread_count;
+          badge.style.display = "inline-block";
+        } else {
+          badge.style.display = "none";
+        }
+      })
+      .catch(() => {});
+  }
+
+  // Sahifa yuklanganda badge ni yangilash
+  loadNotificationsBadge();
+
+  // Har 60 soniyada avtomatik yangilash
+  setInterval(loadNotificationsBadge, 60000);
+
+  // Global scope ga chiqarish (follow tugmasi uchun)
+  window.loadNotificationsBadge = loadNotificationsBadge;
+});

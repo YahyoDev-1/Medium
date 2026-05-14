@@ -81,11 +81,11 @@ class Article(models.Model):
         """Check if a user can view this article."""
         if not self.is_member_only:
             return True
+        if not user or not user.is_authenticated :
+            return False
         if user == self.author:
             return True
-        if user and user.is_authenticated:
-            return self.author.following.filter(follower=user).exists()
-        return False
+        return self.author.followers.filter(follower=user).exists()
 
     def get_root_comments(self):
         return self.comments.filter(parent__isnull=True)\

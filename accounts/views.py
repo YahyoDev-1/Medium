@@ -4,6 +4,8 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
+
+from notifications.models import UserFollowing
 from .forms import CustomUserCreationForm, ProfileForm
 from .models import CustomUser
 from django.contrib import messages
@@ -28,30 +30,42 @@ def profile_view(request, username):
     # Faqat "published" holatidagi maqolalarni ajratib olamiz
     published_articles = user_obj.articles.filter(status='published')
 
+    is_following = False
+    if request.user.is_authenticated and request.user != user_obj:
+        is_following = UserFollowing.objects.filter(
+            follower=request.user, following=user_obj
+        ).exists()
+
     stats = {
         "articles_count": published_articles.count(),  # Faqat chop etilganlarini sanash uchun
-        "followers_count": 0,
+        "followers_count": user_obj.followers.count(),
         "bookmarks_count": user_obj.bookmarks.count() if hasattr(user_obj, "bookmarks") else 0,
     }
 
     return render(request, "accounts/profile.html", {
         "profile_user": user_obj,
         "articles": published_articles,  # Yangi o'zgaruvchi
-        "stats": stats
+        "stats": stats,
+        'is_following': is_following,
     })
 
+
+# accounts/views.py — profile_edit
 @login_required
-def profile_edit(request, username): # 'username' argumentini qo'shdik
+def profile_edit(request, username):
+    # Faqat o'z profilini tahrirlash mumkin
+    if request.user.username != username:
+        return redirect("accounts:profile", username=request.user.username)
+
     if request.method == "POST":
         form = ProfileForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
             messages.success(request, "Profile updated.")
-            return redirect("accounts:profile", username=request.user.username)
+            return redirect("accounts:profile", username=request.user.username)  # ✅
     else:
         form = ProfileForm(instance=request.user)
     return render(request, "accounts/profile_edit.html", {"form": form})
-
 
 
 @require_http_methods(["GET", "POST"])
