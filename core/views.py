@@ -13,6 +13,3 @@ def home(request):
 
 def intro(request):
     return render(request, "core/intro.html")
-
-def premium(request):
-    return render(request, "core/premium.html")
